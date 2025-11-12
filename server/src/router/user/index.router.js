@@ -1,0 +1,13 @@
+const dashbordRouter = require('./dashbord.route.js');
+const manageAccoutRoute = require('./manage-accout.route.js');
+const authorRoute = require('./author.route.js');
+const manageEventRoute = require('./manage-event.route.js');
+
+module.exports = (app) => {
+    app.use('/user/dashbord', dashbordRouter);
+    app.use('/user/manage-account', manageAccoutRoute);
+    app.use('/user/manage-event', manageEventRoute);
+    app.use('/user/author', authorRoute);
+
+    return app;
+}
