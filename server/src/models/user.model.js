@@ -3,15 +3,7 @@ const { Schema } = mongoose;
 
 const moment = require('moment');
 
-const generateRandomString = (length) => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        result += characters[randomIndex];
-    }
-    return result;
-}
+const { generateRandomString } = require('../helpers/random-string.js');
 
 const userSchema = new Schema({
     account: String,
@@ -19,7 +11,6 @@ const userSchema = new Schema({
     clubId: String,
     tokenUser: {
         type: String,
-        required: true,
         default: generateRandomString(20),
     },
     avatar: {

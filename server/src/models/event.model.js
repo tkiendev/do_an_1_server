@@ -6,8 +6,8 @@ const moment = require('moment');
 const eventShema = new Schema({
     name: String,
     description: String,
-    StartTime: { type: Date, set: val => moment(val, "DD/MM/YYYY").toDate() },
-    EndTime: { type: Date, set: val => moment(val, "DD/MM/YYYY").toDate() },
+    StartTime: { type: Date, set: val => moment(val).toDate() },
+    EndTime: { type: Date, set: val => moment(val).toDate() },
     location: String,
     eventManagerId: String,
     eventParticipantsId: {
