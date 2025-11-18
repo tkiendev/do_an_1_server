@@ -14,6 +14,11 @@ app.use(cookieParser());
 const mongodbConnection = require('./config/connectionDb.js');
 mongodbConnection();
 
+// update task status automatically
+const taskUpdateRealTime = require('./update-reale-time/task.update.js');
+taskUpdateRealTime();
+
+// route
 adminRouter(app);
 userRouter(app);
 

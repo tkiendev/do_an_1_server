@@ -185,3 +185,74 @@ module.exports.calendar = async (req, res) => {
         });
     }
 }
+
+// [PUT] /user/manage-task/update/:taskId
+module.exports.updateTask = async (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+        const task = await taskModel.findById(taskId);
+        if (task.status === 'action' || task.status === 'inaction') {
+            return res.status(400).json({
+                code: 400,
+                message: 'Công việc đang được thực hiện, không thể cập nhật',
+                data: null
+            });
+        }
+        const updateData = req.body;
+        const updatedTask = await taskModel.findByIdAndUpdate(taskId, { ...updateData, status: 'update-again' }, { new: true });
+        if (!updatedTask) {
+            return res.status(400).json({
+                code: 400,
+                message: 'Cập nhật công việc thất bại',
+                data: null
+            });
+        }
+        return res.status(200).json({
+            code: 200,
+            message: 'Cập nhật công việc thành công',
+            data: updatedTask
+        });
+    } catch (error) {
+        res.status(500).json({
+            code: 500,
+            message: `error: ${error}`,
+            data: null
+        });
+    }
+}
+
+// [GET] /user/manage-task/detail/:taskId
+module.exports.detailTask = async (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+        if (taskId) {
+            console.log(taskId);
+            const task = await taskModel.findById(taskId);
+            if (!task) {
+                return res.status(404).json({
+                    code: 404,
+                    message: 'Công việc không tồn tại',
+                    data: null
+                });
+            }
+            return res.status(200).json({
+                code: 200,
+                message: 'Lấy chi tiết công việc thành công',
+                data: task
+            });
+        } else {
+            return res.status(400).json({
+                code: 400,
+                message: 'Thiếu thông tin truyển lên',
+                data: null
+            });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            code: 500,
+            message: `error: ${error}`,
+            data: null
+        });
+    }
+}

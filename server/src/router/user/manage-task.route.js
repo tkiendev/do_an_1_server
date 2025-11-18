@@ -14,4 +14,7 @@ router.get('/list-user/:eventId', taskController.listByUser);
 
 router.get('/calendar/:tokenUser', taskController.calendar);
 
+router.get('/detail/:taskId', taskController.detailTask);
+
+router.put('/update/:taskId', taskController.updateTask);
 module.exports = router;
