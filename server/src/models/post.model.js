@@ -12,13 +12,14 @@ const postSchema = new Schema({
     },
     status: {
         type: String,
-        default: 'inactive'
+        enum: ['confirm', 'unconfirm', 'update-again'],
+        default: 'unconfirm'
     },
     eventId: String,
     foundation: {
         type: Array,
         emit: ['facebook', 'instagram', 'twitter', 'website'],
-        default: [],
+        default: ['facebook'],
     },
     deleted: {
         type: Boolean,

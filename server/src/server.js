@@ -7,7 +7,10 @@ const port = process.env.PORT || 3000;
 const adminRouter = require('./router/admin/index.router.js');
 const userRouter = require('./router/user/index.router.js');
 
+
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
