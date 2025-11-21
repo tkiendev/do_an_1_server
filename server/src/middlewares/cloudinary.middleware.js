@@ -1,7 +1,7 @@
 const cloudinary = require('cloudinary').v2;
 
 module.exports = async (req, res, next) => {
-    if (req.files.length > 0) {
+    if (req.files && req.files.length > 0) {
         await cloudinary.config({
             cloud_name: process.env.CLOUDINARY_NAME || 'my_cloud',
             api_key: process.env.CLOUDINARY_API_KEY || 'my_key',
@@ -10,7 +10,6 @@ module.exports = async (req, res, next) => {
 
         const postLinks = []
         for (let file of req.files) {
-            console.log(file)
             const uploadResult = await new Promise((resolve, reject) => {
                 cloudinary.uploader.upload_stream((error, result) => {
                     if (error) return reject(error);

@@ -7,11 +7,18 @@ module.exports.index = async (req, res) => {
         const clubId = req.params.clubId;
         if (clubId) {
             const posts = [];
-            const events = await eventModel.find({ clubPresident: clubId, status: 'confirm' });
+            const events = await eventModel.find({ clubPresident: clubId, status: 'confirm', deleted: false });
             for (const event of events) {
                 const post = await postModel.find({ eventId: event._id });
                 post.eventName = event.name;
                 posts.push(...post);
+            }
+            if (posts.length === 0) {
+                return res.status(404).json({
+                    code: 404,
+                    message: 'Không có bài viết nào',
+                    data: null
+                });
             }
             return res.status(200).json({
                 code: 200,
@@ -49,8 +56,8 @@ module.exports.createPost = async (req, res) => {
             await newPost.save();
 
             if (newPost) {
-                return res.status(201).json({
-                    code: 201,
+                return res.status(200).json({
+                    code: 200,
                     message: 'Tạo bài viết thành công',
                     data: newPost
                 });
@@ -85,15 +92,15 @@ module.exports.updatePost = async (req, res) => {
         const postId = req.params.postId;
         if (postId) {
             const newPost = req.body;
-            if (req.urlFile.length > 0) {
+            if (req.urlFile && req.urlFile.length > 0) {
                 newPost.img = req.urlFile;
             }
-            const result = await postModel.updateOne(postId, { ...newPost, status: 'update-again' });
+            const result = await postModel.updateOne({ _id: postId, deleted: false }, { ...newPost, status: 'update-again' });
             if (result.matchedCount > 0 && result.modifiedCount > 0) {
                 return res.status(201).json({
                     code: 201,
                     message: 'Cập nhật bài viết thành công',
-                    data: null
+                    data: newPost
                 });
             } else if (result.matchedCount > 0 && result.modifiedCount === 0) {
                 return res.status(200).json({
@@ -108,7 +115,6 @@ module.exports.updatePost = async (req, res) => {
                     data: null
                 });
             }
-
         }
     } catch (error) {
         return res.status(500).json({
@@ -124,7 +130,7 @@ module.exports.detailPost = async (req, res) => {
     try {
         const postId = req.params.postId;
         if (postId) {
-            const post = await postModel.findById(postId);
+            const post = await postModel.findOne({ _id: postId, deleted: false });
             if (post) {
                 return res.status(200).json({
                     code: 200,
