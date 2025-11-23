@@ -5,6 +5,7 @@ const manageEventRoute = require('./manage-event.route.js');
 const taskRoute = require('./manage-task.route.js');
 const postRoute = require('./post.route.js');
 const groupRoute = require('./group.route.js');
+const roleRoute = require('./role.route.js');
 
 module.exports = (app) => {
     app.use('/user/dashbord', dashbordRouter);
@@ -14,7 +15,8 @@ module.exports = (app) => {
     app.use('/user/manage-task', taskRoute);
     app.use('/user/manage-post', postRoute);
     app.use('/user/manage-post', postRoute);
-    app.use('user/groups', groupRoute);
+    app.use('/user/groups', groupRoute);
+    app.use('/user/roles', roleRoute);
 
     return app;
 }

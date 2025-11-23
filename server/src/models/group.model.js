@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const groupSchema = new Schema({
     name: String,
     description: String,
+    clubId: String,
     permissions: {
         type: Array,
         default: [],
