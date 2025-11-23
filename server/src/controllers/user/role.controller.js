@@ -6,8 +6,8 @@ module.exports.updateRole = async (req, res) => {
     // dạng req 
 
     // [
-    //     ['GroupId-1', 'GroupId-2'],
-    //     [
+    //     listGroupId: ['GroupId-1', 'GroupId-2'],
+    //     roles: [
     //         ['các quuyền của nhóm GroupId-1'],
     //         ['các quyền của nhóm GroupId-2'],
     //     ]

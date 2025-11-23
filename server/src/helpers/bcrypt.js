@@ -14,3 +14,4 @@ module.exports.verifyPassword = async (password, hash) => {
     const match = await bcrypt.compare(password, hash);
     return match;
 }
+

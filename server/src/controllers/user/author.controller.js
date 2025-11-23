@@ -3,6 +3,7 @@ const clubModel = require('../../models/club.model.js');
 
 const bcryptHelper = require('../../helpers/bcrypt.js');
 
+
 // [POST] /user/author/login
 module.exports.login = async (req, res) => {
     try {
@@ -80,7 +81,6 @@ module.exports.register = async (req, res) => {
     try {
         if (req.body) {
             const [club, accoutClubPresident] = req.body;
-            console.log(club, accoutClubPresident);
             if (club) {
                 const newClub = new clubModel(club);
                 await newClub.save();
@@ -89,6 +89,8 @@ module.exports.register = async (req, res) => {
                 newAccoutClubPresident.password = await bcryptHelper.hashPassword(newAccoutClubPresident.password);
                 newAccoutClubPresident.clubId = newClub._id;
                 await newAccoutClubPresident.save();
+
+                await clubModel.updateOne({ _id: newClub._id }, { clubAbbraviation: newAccoutClubPresident_id });
 
                 if (newClub && newAccoutClubPresident) {
                     res.json({

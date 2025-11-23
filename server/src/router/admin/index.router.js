@@ -1,7 +1,7 @@
+const authRegistration = require('./manage-club.route.js');
+
 module.exports = (app) => {
-    app.get('/admin', (req, res) => {
-        res.send('admin');
-    });
+    app.use('/admin/manage-club', authRegistration);
 
     return app;
 }

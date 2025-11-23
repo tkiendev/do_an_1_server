@@ -55,6 +55,7 @@ const userSchema = new Schema({
     },
     status: {
         type: String,
+        emit: ['active', 'inactive'],
         default: 'inactive'
     }
 });

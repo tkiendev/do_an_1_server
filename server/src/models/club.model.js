@@ -8,7 +8,8 @@ const clubShema = new Schema({
     nameOfTheOwner: String,
     status: {
         type: String,
-        default: 'inactive'
+        emit: ['confirm', 'unconfirm', 'update-again'],
+        default: 'unconfirm'
     },
     deleted: {
         type: Boolean,
