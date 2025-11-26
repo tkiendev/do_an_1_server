@@ -47,7 +47,6 @@ module.exports.createPost = async (req, res) => {
     try {
         const eventId = req.params.eventId;
         if (eventId) {
-            const post = req.body;
             post.img = req.urlFile;
             post.eventId = eventId;
             post.foundation = JSON.parse(post.foundation);

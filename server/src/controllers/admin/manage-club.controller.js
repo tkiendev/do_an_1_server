@@ -65,7 +65,7 @@ module.exports.confirmRegistration = async (req, res) => {
             Tài khoản và mật khẩu của bạn (vui lòng ko tiết lộ tài khảon mật khẩu cho bất kỳ ai)
             
             Tài khoản: ${user.account}
-            Mật khẩu: 
+            Mật khẩu: *********
             
             Câu lạc bộ của bạn sẽ bắt đầu từ hôm nay 
             `;
@@ -87,3 +87,4 @@ module.exports.confirmRegistration = async (req, res) => {
         });
     }
 }
+
