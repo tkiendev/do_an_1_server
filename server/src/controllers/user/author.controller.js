@@ -88,6 +88,7 @@ module.exports.register = async (req, res) => {
                 const newAccoutClubPresident = new userModel(accoutClubPresident);
                 newAccoutClubPresident.password = await bcryptHelper.hashPassword(newAccoutClubPresident.password);
                 newAccoutClubPresident.clubId = newClub._id;
+                newAccoutClubPresident.regency = 'club-leader';
                 await newAccoutClubPresident.save();
 
                 await clubModel.updateOne({ _id: newClub._id }, { clubAbbraviation: newAccoutClubPresident_id });

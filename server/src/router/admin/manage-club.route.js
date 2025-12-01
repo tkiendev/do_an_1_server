@@ -5,7 +5,7 @@ const manageClubController = require('../../controllers/admin/manage-club.contro
 
 // admin/manage-club
 router.get('/index', manageClubController.index);
-router.post('/confirm-registration/:clubId/:userId', manageClubController.confirmRegistration);
+router.put('/confirm-registration/:clubId/:userId', manageClubController.confirmRegistration);
 
 
 

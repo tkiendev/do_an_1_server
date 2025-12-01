@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+
+const manageEventClubController = require('../../controllers/admin/manage-event-club.controller.js');
+
+router.get('/index', manageEventClubController.index);
+router.put('/confirm/:envenId', manageEventClubController.confirmEvent);
+router.get('/detail/:envenId', manageEventClubController.detailEvent);
+router.get('/task/:evenId', manageEventClubController.taskEvent);
+
+module.exports = router;

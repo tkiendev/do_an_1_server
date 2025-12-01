@@ -48,7 +48,7 @@ module.exports.index = async (req, res) => {
     }
 }
 
-// [POST] /admin/manage-club/confirm-registration/:clubId/:userId
+// [PUT] /admin/manage-club/confirm-registration/:clubId/:userId
 module.exports.confirmRegistration = async (req, res) => {
     try {
         const { clubId, userId } = req.params;

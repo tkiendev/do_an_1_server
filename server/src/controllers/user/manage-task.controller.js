@@ -23,7 +23,6 @@ module.exports.index = async (req, res) => {
                 if (event.tasksId.length > 0) {
                     for (let taskId of event.tasksId) {
                         const task = await taskModel.findOne({ _id: taskId, ...find });
-                        console.log(task);
                         if (task) {
                             tasks.push(task);
                         }
@@ -118,7 +117,6 @@ module.exports.create = async (req, res) => {
     try {
         const task = req.body;
         const eventId = req.params.eventId;
-        console.log(req.body);
         if (!task) {
             return res.status(400).json({
                 code: 400,

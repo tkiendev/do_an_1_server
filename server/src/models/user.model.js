@@ -23,7 +23,7 @@ const userSchema = new Schema({
     },
     regency: {
         type: String,
-        enum: ['member', 'club leader', 'vice president of the club', 'secretary', 'prefect'],
+        enum: ['member', 'club-leader', 'vice-president-of-the-club', 'secretary', 'prefect'],
     },
     groupId: String,
     fullname: String,
