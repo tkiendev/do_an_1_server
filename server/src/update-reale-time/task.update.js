@@ -7,7 +7,6 @@ module.exports = () => {
             const now = new Date();
             const tasks = await taskModel.find({});
             for (let task of tasks) {
-                console.log(task.StartTime, " | ", now, (task.StartTime < now));
                 if (task.status === 'update-again' || task.status === 'unconfirm') {
                     continue;
                 }

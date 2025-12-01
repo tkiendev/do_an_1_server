@@ -149,3 +149,39 @@ module.exports.taskEvent = async (req, res) => {
         });
     }
 }
+
+// [PUT] /admin/manage-event-club/task/:taskId/:accept(confirm || unconfirm || inaction)
+module.exports.confirmtaskEvent = async (req, res) => {
+    try {
+        const { taskId, accept } = req.params;
+        const test = req.params
+        console.log(taskId, accept, test)
+        if (taskId && accept) {
+            const result = await taskModel.updateOne({ _id: taskId }, { status: accept });
+            if (result.matchedCount > 0 && result.modifiedCount > 0) {
+                return res.status(201).json({
+                    code: 201,
+                    message: 'Cập nhật công việc thành công',
+                    data: null
+                });
+            } else if (result.matchedCount > 0 && result.modifiedCount === 0) {
+                return res.status(500).json({
+                    code: 500,
+                    message: 'Cập nhật công việc thất bại',
+                    data: null
+                });
+            } else {
+                return res.status(404).json({
+                    code: 404,
+                    message: 'Không tìn thấy công việc cần cập nhật vui lòng kiểm tra lại!',
+                    data: null
+                });
+            }
+        }
+    } catch (error) {
+        return res.status(500).json({
+            code: 500,
+            message: `error: ${error}`
+        });
+    }
+}

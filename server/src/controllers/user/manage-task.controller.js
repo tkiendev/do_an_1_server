@@ -159,7 +159,6 @@ module.exports.calendar = async (req, res) => {
         const tokenUser = req.params.tokenUser;
         if (tokenUser) {
             const userId = (await userModel.findOne({ tokenUser: tokenUser })).id;
-            console.log(userId);
             const task = await taskModel.find({ "workParticipantsId": userId, status: 'confirm' });
 
             return res.status(200).json({
@@ -224,7 +223,6 @@ module.exports.detailTask = async (req, res) => {
     try {
         const taskId = req.params.taskId;
         if (taskId) {
-            console.log(taskId);
             const task = await taskModel.findById(taskId);
             if (!task) {
                 return res.status(404).json({
