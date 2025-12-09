@@ -1,6 +1,7 @@
 const groupModel = require('../../models/group.model.js');
+const userModel = require('../../models/user.model.js');
 
-// [GET] /user/roles/update-role
+// [PUT] /user/roles/update-role
 module.exports.updateRole = async (req, res) => {
 
     // dạng req 
@@ -95,6 +96,59 @@ module.exports.updateRole = async (req, res) => {
             code: 500,
             message: `error: ${error}`,
             data: null
+        });
+    }
+}
+
+// [PUT] /user/roles/add-user/:userId/:groupId
+module.exports.addUser = async (req, res) => {
+    try {
+        const { userId, groupId } = req.params;
+        if (userId && groupId) {
+            const user = await userModel.findOne({ _id: userId }).select('groupId');
+            if (user) {
+                return res.status(500).json({
+                    code: 500,
+                    message: 'Người dùng đã có nhóm vui lòng chọn người dùng khác',
+                });
+            }
+            const result = await userModel.updateOne({ _id: userId }, { groupId: groupId });
+            if (result.matchedCount > 0 && result.modifiedCount > 0) {
+                return res.status(200).json({
+                    code: 200,
+                    message: 'Thêm vào nhóm quyền thành công',
+                });
+            } else if (result.matchedCount > 0 && result.modifiedCount === 0) {
+                return res.status(500).json({
+                    code: 500,
+                    message: 'Thêm vào nhóm quyền thất bại',
+                });
+            } else {
+                return res.status(204).json({
+                    code: 204,
+                    message: 'Không tìm thấy người dùng trong hệ thống',
+                });
+            }
+        }
+    } catch (error) {
+        return res.status(500).json({
+            code: 500,
+            message: `error: ${error}`,
+        });
+    }
+}
+
+//[GET] /user/roles/list-user/:clubId
+module.exports.addUser = async (req, res) => {
+    try {
+        const clubId = req.params.clubId;
+        if (clubId) {
+
+        }
+    } catch (error) {
+        return res.status(500).json({
+            code: 500,
+            message: `error: ${error}`,
         });
     }
 }

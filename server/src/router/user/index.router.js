@@ -7,7 +7,11 @@ const postRoute = require('./post.route.js');
 const groupRoute = require('./group.route.js');
 const roleRoute = require('./role.route.js');
 
+const checkTokenUserValidation = require('../../validation/check-token.validation.js');
+
 module.exports = (app) => {
+    // app.use(checkTokenUserValidation);
+
     app.use('/user/dashbord', dashbordRouter);
     app.use('/user/manage-account', manageAccoutRoute);
     app.use('/user/manage-event', manageEventRoute);

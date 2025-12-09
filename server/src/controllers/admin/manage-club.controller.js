@@ -1,4 +1,4 @@
-
+const groupModel = require('../../models/group.model.js');
 const clubModel = require('../../models/club.model.js');
 const userModel = require('../../models/user.model.js');
 
@@ -58,6 +58,34 @@ module.exports.confirmRegistration = async (req, res) => {
 
             const user = await userModel.findOne({ _id: userId });
             const club = await clubModel.findOne({ _id: clubId });
+
+            // thêm vào nhóm quyền
+            const group = {
+                name: 'Nhóm trưởng',
+                description: 'nhóm dành cho những người quản lý(trưởng - phó câu lạc bộ)',
+                permissions: [
+                    'post-create',
+                    'post_detail',
+                    'task_create',
+                    'task_update',
+                    'task_detail',
+                    'event_create',
+                    'event_update',
+                    'event_detail',
+                    'account_create',
+                    'account_update',
+                    'account_detail',
+                    'group_create',
+                    'group_update',
+                    'group_detail',
+                    'group_delete',
+                    'role_update'
+                ],
+                clubId: club.id,
+            }
+            const newGroup = new groupModel(group);
+            newGroup.save();
+            await userModel.updateOne({ _id: userId }, { groupId: newGroup.id });
 
             // gửi email tự động
             let text = `

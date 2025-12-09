@@ -118,17 +118,19 @@ module.exports.detailEvent = async (req, res) => {
     }
 }
 
-// [GET] /admin/manage-event-club/task/:envenId
+// [GET] /admin/manage-event-club/task/:evenId
 module.exports.taskEvent = async (req, res) => {
     try {
-        const envenId = req.params.envenId;
+        const envenId = req.params.evenId;
         if (envenId) {
             const event = await eventModel.findOne({ _id: envenId });
             if (event) {
-                const listTask = event.tasksId.map(async id => {
-                    const task = await taskModel.findOne({ _id: id });
-                    return task;
-                });
+                const listTask = await Promise.all(
+                    event.tasksId.map(async id => {
+                        const task = await taskModel.findOne({ _id: id });
+                        return task;
+                    })
+                );
                 return res.status(200).json({
                     code: 200,
                     message: 'Lấy dữ liệu thành công',

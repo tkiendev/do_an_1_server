@@ -22,10 +22,7 @@ const adminSchema = new Schema({
     fullname: String,
     sex: String,
     address: String,
-    usersId: Array,
-    clubsId: Array,
     notifocationsId: Array,
-    postsId: Array,
     deleted: { type: Boolean, default: false }
 });
 

@@ -138,10 +138,11 @@ module.exports.edit = async (req, res) => {
     };
 }
 
-// [POST] /user/manage-account/create/:clubId
+// [POST] /user/manage-account/create/:clubId/:groupId
 module.exports.create = async (req, res) => {
     try {
         const accout = req.body;
+        console.log(req.body);
         if (accout) {
             accout.clubId = (await clubModel.findOne({ _id: req.params.clubId })).id;
             if (!accout.clubId) {
