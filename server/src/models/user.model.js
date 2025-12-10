@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const moment = require('moment');
 
-const { generateRandomString } = require('../helpers/random-string.js');
+const CryptoJS = require("crypto-js");
 
 const userSchema = new Schema({
     account: String,
@@ -11,7 +11,7 @@ const userSchema = new Schema({
     clubId: String,
     tokenUser: {
         type: String,
-        default: generateRandomString(20),
+        default: () => CryptoJS.lib.WordArray.random(16).toString(),
     },
     avatar: {
         type: String,
@@ -41,7 +41,7 @@ const userSchema = new Schema({
         default: 'Hà Nội'
     },
     sector: String,
-    dateOfBirth: { type: Date, set: val => moment(val, "DD/MM/YYYY").toDate() },
+    dateOfBirth: { type: Date, set: val => moment(val, "YYYY-MM-DD").toDate() },
     cccd: Number,
     phone: Number,
     emailUNETI: String,

@@ -1,4 +1,3 @@
-const { text } = require("express");
 const nodemailer = require("nodemailer");
 
 module.exports.sendAutoEmail = async (subject, text, toEmail) => {
@@ -11,7 +10,7 @@ module.exports.sendAutoEmail = async (subject, text, toEmail) => {
     });
     await transporter.sendMail({
         from: process.env.USER_EMAIL,
-        to: user.emailUNETI,
+        to: toEmail,
         subject: subject,
         text: text,
         // html: "<b>Hello world?</b>", 

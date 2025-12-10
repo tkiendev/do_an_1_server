@@ -2,6 +2,7 @@ const accountModel = require('../../models/user.model.js');
 const clubModel = require('../../models/club.model.js');
 
 const bcryptHelper = require('../../helpers/bcrypt.js');
+const sendAutoEmail = require('../../helpers/send-auto-email.js');
 
 // [GET] /user/manage-account/
 module.exports.index = async (req, res) => {
@@ -138,11 +139,10 @@ module.exports.edit = async (req, res) => {
     };
 }
 
-// [POST] /user/manage-account/create/:clubId/:groupId
+// [POST] /user/manage-account/create/:clubId
 module.exports.create = async (req, res) => {
     try {
         const accout = req.body;
-        console.log(req.body);
         if (accout) {
             accout.clubId = (await clubModel.findOne({ _id: req.params.clubId })).id;
             if (!accout.clubId) {
@@ -153,11 +153,28 @@ module.exports.create = async (req, res) => {
                 });
             }
 
+            const userpassword = accout.password;
+
             accout.password = await bcryptHelper.hashPassword(accout.password);
             const newAccout = new accountModel(accout);
+            newAccout.status = 'active';
             await newAccout.save();
 
             if (newAccout) {
+                const subject = `Câu lạc bộ thông báo tạo thành công tài khoản`;
+                const text = `
+                    Chào mừng bạn đến với câu lạc bộ 
+                    Tài khoản của bạn đã được tạo thành công 
+                    
+                    Tài khoản đăng nhập: ${newAccout.account}
+                    Mật khẩu đăng nhập: ${userpassword}
+
+                    Vui lòng không tiết lộ tài khoản mật khẩu ra bên ngoài
+                `;
+                const toEmail = newAccout.email;
+                sendAutoEmail(subject, text, toEmail);
+
+
                 res.json({
                     code: 200,
                     message: `Tạo tài khoản thành công`,

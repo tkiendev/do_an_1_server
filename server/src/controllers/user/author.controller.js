@@ -7,55 +7,66 @@ const bcryptHelper = require('../../helpers/bcrypt.js');
 // [POST] /user/author/login
 module.exports.login = async (req, res) => {
     try {
-        if (req.body) {
-            const { account, password } = req.body;
-            const user = await userModel.findOne({
-                account: account,
-                deleted: false,
-                status: 'active'
+        if (!req.body) {
+            return res.json({
+                code: 401,
+                message: "Vui lòng truyền lên thông tin tài khoản và mật khẩu",
+                data: null,
             });
-            if (user) {
-                const checkLogin = (await bcryptHelper.verifyPassword(password, user.password));
-                if (checkLogin) {
-                    res.json({
-                        code: 200,
-                        message: `Đăng nhập thành công`,
-                        data: {
-                            tokenUser: user.tokenUser,
-                            clubId: user.clubId,
-                        }
-                    });
-                } else {
-                    res.json({
-                        code: 200,
-                        message: `Sai mật khẩu vui lòng kiểm tra lại`,
-                        data: null
-                    });
-                }
+        }
 
-            } else {
-                res.json({
-                    code: 200,
-                    message: `Tài khoản không tồn tại hoặc đã bị xóa`,
-                    data: null
-                });
-            }
-        }
-        else {
-            res.json({
-                code: 200,
-                message: `Vui lòng truyền lên thông tin tài khoản và mật khẩu`,
-                data: null
+        const { account, password } = req.body;
+
+        // Tìm user theo account và chưa bị xóa
+        const user = await userModel.findOne({
+            account: account,
+            deleted: false,
+        });
+
+        if (!user) {
+            return res.json({
+                code: 404,
+                message: "Tài khoản không tồn tại hoặc đã bị xóa",
+                data: null,
             });
         }
+
+        // Kiểm tra trạng thái
+        if (user.status !== "active") {
+            return res.json({
+                code: 403,
+                message: "Tài khoản chưa được kích hoạt hoặc đang bị khóa",
+                data: null,
+            });
+        }
+
+        // Kiểm tra mật khẩu
+        const checkLogin = await bcryptHelper.verifyPassword(password, user.password);
+        if (!checkLogin) {
+            return res.json({
+                code: 201,
+                message: "Sai mật khẩu vui lòng kiểm tra lại",
+                data: null,
+            });
+        }
+
+        // Đăng nhập thành công
+        return res.json({
+            code: 200,
+            message: "Đăng nhập thành công",
+            data: {
+                tokenUser: user.tokenUser,
+                clubId: user.clubId,
+            },
+        });
     } catch (error) {
-        res.json({
-            code: 400,
+        return res.json({
+            code: 500,
             message: `error: ${error}`,
-            data: null
+            data: null,
         });
     }
-}
+};
 
 // [POST] /user/author/logout
 module.exports.logout = async (req, res) => {
