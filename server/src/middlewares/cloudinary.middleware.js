@@ -27,6 +27,7 @@ module.exports = async (req, res, next) => {
         }
 
         req.urlFile = postLinks;
+
         next();
     } else {
         next();

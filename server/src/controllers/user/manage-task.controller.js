@@ -5,12 +5,10 @@ const userModel = require('../../models/user.model.js');
 // [GET] /user/manage-task/:clubId
 module.exports.index = async (req, res) => {
     try {
+
         const clubId = req.params.clubId;
-        const find = {
-            ...req.querys
-        };
         if (clubId) {
-            const events = await eventModel.find({ clubPresident: clubId, status: 'confirm' });
+            const events = await eventModel.find({ clubPresident: clubId });
             const tasks = [];
             if (events.length === 0) {
                 return res.status(200).json({
@@ -22,7 +20,7 @@ module.exports.index = async (req, res) => {
             for (let event of events) {
                 if (event.tasksId.length > 0) {
                     for (let taskId of event.tasksId) {
-                        const task = await taskModel.findOne({ _id: taskId, ...find });
+                        const task = await taskModel.findOne({ _id: taskId });
                         if (task) {
                             tasks.push(task);
                         }
@@ -44,6 +42,82 @@ module.exports.index = async (req, res) => {
             }
         }
 
+    } catch (error) {
+        res.status(500).json({
+            code: 500,
+            message: `error: ${error}`,
+            data: null
+        });
+    }
+}
+
+// [GET] /user/manage-task/event/:eventId
+module.exports.indexEvent = async (req, res) => {
+    try {
+        const eventId = req.params.eventId;
+        const find = {
+            ...req.querys
+        };
+        if (eventId) {
+            const event = await eventModel.findOne({ _id: eventId, status: 'confirm' });
+            const tasks = [];
+            if (event.tasksId.length === 0) {
+                return res.status(200).json({
+                    code: 200,
+                    message: 'Không có công việc nào cho sự kiện',
+                    data: []
+                });
+            }
+            for (let taskId of event.tasksId) {
+                const task = await taskModel.findOne({ _id: taskId, ...find });
+                if (task) {
+                    tasks.push(task);
+                }
+            }
+            if (tasks.length === 0) {
+                return res.status(200).json({
+                    code: 200,
+                    message: 'Không có công việc nào',
+                    data: []
+                });
+            } else {
+                return res.status(200).json({
+                    code: 200,
+                    message: 'Lấy danh sách công việc thành công',
+                    data: tasks
+                });
+            }
+        }
+    } catch (error) {
+        res.status(500).json({
+            code: 500,
+            message: `error: ${error}`,
+            data: null
+        });
+    }
+}
+// [GET] /user/manage-task/list-user-task/:taskId
+module.exports.listUserTask = async (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+        const task = await taskModel.findOne({ _id: taskId });
+        const users = [];
+        for (const userId of task.workParticipantsId) {
+            const user = await userModel.findOne({ _id: userId, status: 'active' }).select('-password -account  -tokenUser');
+            users.push(user);
+        }
+        if (users.length === 0) {
+            return res.status(404).json({
+                code: 404,
+                message: 'không có người dùng nào tham gia công việc',
+                data: []
+            });
+        }
+        return res.status(200).json({
+            code: 200,
+            message: 'Lấy danh sách người dùng theo công việc thành công',
+            data: users
+        });
     } catch (error) {
         res.status(500).json({
             code: 500,
@@ -117,6 +191,7 @@ module.exports.create = async (req, res) => {
     try {
         const task = req.body;
         const eventId = req.params.eventId;
+
         if (!task) {
             return res.status(400).json({
                 code: 400,
@@ -252,3 +327,42 @@ module.exports.detailTask = async (req, res) => {
         });
     }
 }
+
+// [GET] /user/manage-task/getEvent/:taskId
+module.exports.eventByTask = async (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+
+        if (!taskId) {
+            return res.status(400).json({
+                code: 400,
+                message: 'Thiếu thông tin truyền lên',
+                data: null
+            });
+        }
+
+        // Tìm event có chứa taskId trong mảng tasksId
+        const event = await eventModel.findOne({ tasksId: taskId });
+
+        if (!event) {
+            return res.status(404).json({
+                code: 404,
+                message: 'Không tìm thấy sự kiện cho công việc này',
+                data: null
+            });
+        }
+
+        return res.status(200).json({
+            code: 200,
+            message: 'Lấy thông tin sự kiện thành công',
+            data: event
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            code: 500,
+            message: `error: ${error}`,
+            data: null
+        });
+    }
+};

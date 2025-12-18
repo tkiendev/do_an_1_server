@@ -7,5 +7,6 @@ router.post('/login', authorController.login);
 router.post('/logout', authorController.logout);
 
 router.post('/register-club', authorController.register);
+router.get('/get-group', authorController.getGroup);
 
 module.exports = router;

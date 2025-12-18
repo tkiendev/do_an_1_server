@@ -11,7 +11,6 @@ module.exports.login = async (req, res) => {
             });
             if (admin) {
                 // const checkLogin = (await bcryptHelper.verifyPassword(password, admin.password));
-                console.log(adminPassword)
                 const checkLogin = adminPassword === admin.adminPassword ? true : false;
                 if (checkLogin) {
                     res.json({
@@ -23,7 +22,7 @@ module.exports.login = async (req, res) => {
                     });
                 } else {
                     res.json({
-                        code: 200,
+                        code: 500,
                         message: `Sai mật khẩu vui lòng kiểm tra lại`,
                         data: null
                     });
@@ -31,7 +30,7 @@ module.exports.login = async (req, res) => {
 
             } else {
                 res.json({
-                    code: 200,
+                    code: 500,
                     message: `Tài khoản không tồn tại hoặc đã bị xóa`,
                     data: null
                 });
@@ -39,7 +38,7 @@ module.exports.login = async (req, res) => {
         }
         else {
             res.json({
-                code: 200,
+                code: 500,
                 message: `Vui lòng truyền lên thông tin tài khoản và mật khẩu`,
                 data: null
             });

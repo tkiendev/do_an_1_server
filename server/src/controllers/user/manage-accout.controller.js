@@ -2,7 +2,7 @@ const accountModel = require('../../models/user.model.js');
 const clubModel = require('../../models/club.model.js');
 
 const bcryptHelper = require('../../helpers/bcrypt.js');
-const sendAutoEmail = require('../../helpers/send-auto-email.js');
+const emailAuto = require('../../helpers/send-auto-email.js');
 
 // [GET] /user/manage-account/
 module.exports.index = async (req, res) => {
@@ -81,11 +81,15 @@ module.exports.deleteAccout = async (req, res) => {
     };
 }
 
-// [PATCH] /user/manage-account/edit/:id
+// [PUT] /user/manage-account/edit/:id
 module.exports.edit = async (req, res) => {
     try {
         const userId = req.params.id;
         const newAccount = req.body;
+        // Kiểm tra avatar upload
+        if (req.urlFile && req.urlFile.length > 0) {
+            newAccount.avatar = req.urlFile[0];
+        }
 
         if (newAccount.cccd) {
             newAccount.cccd = parseInt(newAccount.cccd);
@@ -96,12 +100,14 @@ module.exports.edit = async (req, res) => {
         if (newAccount.msv) {
             newAccount.msv = parseInt(newAccount.msv);
         }
-
+        if (newAccount.password) {
+            newAccount.password = await bcryptHelper.hashPassword(newAccount.password);
+        }
         if (newAccount) {
             const result = await accountModel.updateOne({ _id: userId }, newAccount);
             if (result.acknowledged && !result.matchedCount) {
                 res.json({
-                    code: 200,
+                    code: 404,
                     message: `Không tìm thấy tài khoản trong cớ sở dữ liệu`,
                     data: null
                 });
@@ -117,7 +123,7 @@ module.exports.edit = async (req, res) => {
                     return;
                 } else {
                     res.json({
-                        code: 200,
+                        code: 202,
                         message: `Các trường dữ liệu giống với các trường dữ liệu đã có trước đó`,
                         data: null
                     });
@@ -125,14 +131,14 @@ module.exports.edit = async (req, res) => {
             }
         } else {
             res.json({
-                code: 400,
+                code: 500,
                 message: `Vui lòng truyền lên dữ liệu`,
                 data: null
             });
         }
     } catch (error) {
         res.json({
-            code: 400,
+            code: 500,
             message: `error: ${error}`,
             data: null
         });
@@ -158,6 +164,7 @@ module.exports.create = async (req, res) => {
             accout.password = await bcryptHelper.hashPassword(accout.password);
             const newAccout = new accountModel(accout);
             newAccout.status = 'active';
+            newAccout.avatar = req.urlFile[0];
             await newAccout.save();
 
             if (newAccout) {
@@ -172,8 +179,7 @@ module.exports.create = async (req, res) => {
                     Vui lòng không tiết lộ tài khoản mật khẩu ra bên ngoài
                 `;
                 const toEmail = newAccout.email;
-                sendAutoEmail(subject, text, toEmail);
-
+                emailAuto.sendAutoEmail(subject, text, toEmail);
 
                 res.json({
                     code: 200,
@@ -209,7 +215,7 @@ module.exports.detail = async (req, res) => {
     try {
         const userId = req.params.id;
         if (userId) {
-            const user = await accountModel.findOne({ _id: userId, deleted: false }).selected('-tokenUser -password');
+            const user = await accountModel.findOne({ _id: userId, deleted: false });
             if (user) {
                 res.json({
                     code: 200,

@@ -9,9 +9,8 @@ module.exports.index = async (req, res) => {
         const query = req.query;
         const find = {
             deleted: false,
-            status: 'confirm'
         }
-        if (query.status && (query.status === 'confirm' || query.status === 'unconfirm')) {
+        if (query.status && (query.status === 'confirm' || query.status === 'unconfirm' || query.status === 'update-again')) {
             find.status = query.status;
         }
 
@@ -26,16 +25,23 @@ module.exports.index = async (req, res) => {
             const listEvent = await Promise.all(
                 events.map(async event => {
                     const club = await clubModel.findOne({ _id: event.clubPresident });
-                    const user = await userModel.find({ clubId: club._id }).select('-tokenUser -password -accout');
+                    let userParticipants = [];
+                    const userManager = await userModel.findOne({ _id: event.eventManagerId });
+                    for (let i = 0; i < event.eventParticipantsId.length; i++) {
+                        const user = await userModel.findOne({ _id: event.eventParticipantsId[i] });
+                        if (user) {
+                            userParticipants.push(user);
+                        }
+                    }
                     return {
                         event,
                         club,
-                        user
+                        userParticipants,
+                        userManager
                     };
                 })
             );
 
-            console.log(listEvent); // lúc này mới là dữ liệu thật
             return res.status(200).json({
                 code: 200,
                 message: 'lấy dữ liệu thành công',

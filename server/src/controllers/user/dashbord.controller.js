@@ -6,9 +6,8 @@ module.exports.userDetail = async (req, res) => {
     try {
         const token = req.headers['tokenuser'];
         if (token) {
-            const user = await userModel.findOne({
-                tokenUser: token
-            }).select('-tokenUser -password -account');
+            const user = await userModel.findOne({ tokenUser: token })
+                .select('-tokenUser -password -account -_id -__v');
 
             if (user) {
                 res.json({
@@ -81,3 +80,45 @@ module.exports.clubDetail = async (req, res) => {
         });
     }
 }
+
+// [PUT] /user/dashbord/update-user
+module.exports.updateUser = async (req, res) => {
+    try {
+        const token = req.headers['tokenuser'];
+        const newUser = req.body;
+        if (!token) {
+            return res.json({
+                code: 200,
+                message: 'Vui lòng thêm token',
+                data: null
+            });
+        }
+
+        const user = await userModel.findOneAndUpdate(
+            { tokenUser: token },
+            newUser,
+            { new: true }
+        ).select('-tokenUser -password -account -_id -__v');
+
+        if (user) {
+            return res.json({
+                code: 200,
+                message: 'Cập nhật người dùng thành công',
+                data: user
+            });
+        } else {
+            return res.json({
+                code: 200,
+                message: 'Không tìm thấy người dùng trong hệ thống',
+                data: null
+            });
+        }
+
+    } catch (error) {
+        return res.json({
+            code: 400,
+            message: `error: ${error}`,
+            data: null
+        });
+    }
+};

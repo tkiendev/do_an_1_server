@@ -3,7 +3,6 @@ const groupModel = require('../../models/group.model.js');
 // [GET] /user/groups/index/:clubId
 module.exports.index = async (req, res) => {
     try {
-        console.log(req.params.clubId)
         const groups = await groupModel.find({ clubId: req.params.clubId, deleted: false });
 
         if (groups.length > 0) {

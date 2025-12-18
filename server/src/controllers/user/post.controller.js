@@ -42,36 +42,26 @@ module.exports.index = async (req, res) => {
     }
 }
 
-// [POST] /user/manage-post/create/:eventId
+// [POST] /user/manage-post/create
 module.exports.createPost = async (req, res) => {
     try {
-        const eventId = req.params.eventId;
-        if (eventId) {
-            post.img = req.urlFile;
-            post.eventId = eventId;
-            post.foundation = JSON.parse(post.foundation);
+        const post = req.body;
+        post.img = req.urlFile;
 
-            const newPost = new postModel(post);
-            await newPost.save();
+        const newPost = new postModel(post);
+        await newPost.save();
 
-            if (newPost) {
-                return res.status(200).json({
-                    code: 200,
-                    message: 'Tạo bài viết thành công',
-                    data: newPost
-                });
-            }
-            else {
-                return res.status(400).json({
-                    code: 400,
-                    message: 'Tạo bài viết thất bại',
-                    data: null
-                });
-            }
-        } else {
+        if (newPost) {
+            return res.status(200).json({
+                code: 200,
+                message: 'Tạo bài viết thành công',
+                data: newPost
+            });
+        }
+        else {
             return res.status(400).json({
                 code: 400,
-                message: 'Thiếu eventId',
+                message: 'Tạo bài viết thất bại',
                 data: null
             });
         }

@@ -21,7 +21,7 @@ const eventShema = new Schema({
     },
     status: {
         type: String,
-        enum: ['confirm', 'unconfirm'],
+        enum: ['confirm', 'unconfirm', 'update-again'],
         default: 'unconfirm'
     },
     deleted: {

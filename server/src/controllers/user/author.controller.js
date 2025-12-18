@@ -1,8 +1,8 @@
 const userModel = require('../../models/user.model.js');
 const clubModel = require('../../models/club.model.js');
+const groupModel = require('../../models/group.model.js');
 
 const bcryptHelper = require('../../helpers/bcrypt.js');
-
 
 // [POST] /user/author/login
 module.exports.login = async (req, res) => {
@@ -42,6 +42,7 @@ module.exports.login = async (req, res) => {
 
         // Kiểm tra mật khẩu
         const checkLogin = await bcryptHelper.verifyPassword(password, user.password);
+        // const checkLogin = password === user.password;
         if (!checkLogin) {
             return res.json({
                 code: 201,
@@ -112,6 +113,42 @@ module.exports.register = async (req, res) => {
                     });
                 }
             }
+        }
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: `error: ${error}`,
+            data: null
+        });
+    }
+}
+
+// [GET] /user/author/groud
+module.exports.getGroup = async (req, res) => {
+    try {
+        const tokenUser = req.headers.tokenuser;
+        if (!tokenUser) {
+            return res.json({
+                code: 401,
+                message: "Vui lòng đăng nhập để thực hiện hành động",
+                data: null,
+            });
+        }
+        const user = await userModel.findOne({ tokenUser: tokenUser, deleted: false });
+        if (!user) {
+            return res.json({
+                code: 404,
+                message: "Tài khoản không tồn tại hoặc đã bị xóa",
+                data: null,
+            });
+        } else {
+            const groupId = user.groupId;
+            const group = await groupModel.findOne({ _id: groupId, deleted: false });
+            res.json({
+                code: 200,
+                message: `Lấy thông tin nhóm thành công`,
+                data: group
+            });
         }
     } catch (error) {
         res.json({

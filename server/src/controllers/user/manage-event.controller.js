@@ -9,7 +9,7 @@ module.exports.index = async (req, res) => {
         };
 
         const query = req.query;
-        if (query.status) {
+        if (query.status && query.status === 'confirm' || query.status === 'unconfirm' || query.status === 'update-again') {
             find.status = query.status;
         }
 
@@ -50,7 +50,6 @@ module.exports.index = async (req, res) => {
 module.exports.create = (req, res) => {
     try {
         const clubId = req.params.clubId;
-
         const event = req.body;
         if (!clubId) {
             return res.status(400).json({
@@ -67,7 +66,6 @@ module.exports.create = (req, res) => {
             });
         }
 
-        event.eventParticipantsId = event.eventParticipantsId.split(',')
         const newEvent = new eventModel({
             ...event,
             clubPresident: clubId
@@ -132,6 +130,7 @@ module.exports.update = async (req, res) => {
     try {
         const eventId = req.params.eventId;
         const updatedEvent = req.body;
+        updatedEvent.status = 'update-again';
         if (!eventId) {
             return res.status(400).json({
                 code: 400,

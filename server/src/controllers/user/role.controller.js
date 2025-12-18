@@ -64,25 +64,13 @@ module.exports.updateRole = async (req, res) => {
                 const role = roles[i];
 
                 const result = await groupModel.updateOne({ _id: groupId }, { $set: { permissions: role } });
-                if (result.matchedCount > 0 && result.modifiedCount > 0) {
-                    return res.status(201).json({
-                        code: 201,
+                if (result)
+                    res.status(200).json({
+                        code: 200,
                         message: 'Cập nhật quyền thành công',
                         data: null
                     });
-                } else if (result.matchedCount > 0 && result.modifiedCount === 0) {
-                    return res.status(200).json({
-                        code: 200,
-                        message: 'Cập nhật quyền thất bại',
-                        data: null
-                    });
-                } else {
-                    return res.status(404).json({
-                        code: 404,
-                        message: 'Không tìn thấy nhóm quyền vui lòng kiểm tra lại!',
-                        data: null
-                    });
-                }
+
             }
         } else {
             return res.status(200).json({
@@ -105,8 +93,8 @@ module.exports.addUser = async (req, res) => {
     try {
         const { userId, groupId } = req.params;
         if (userId && groupId) {
-            const user = await userModel.findOne({ _id: userId }).select('groupId');
-            if (user) {
+            const user = await userModel.findOne({ _id: userId });
+            if (user.groupId) {
                 return res.status(500).json({
                     code: 500,
                     message: 'Người dùng đã có nhóm vui lòng chọn người dùng khác',
@@ -129,21 +117,6 @@ module.exports.addUser = async (req, res) => {
                     message: 'Không tìm thấy người dùng trong hệ thống',
                 });
             }
-        }
-    } catch (error) {
-        return res.status(500).json({
-            code: 500,
-            message: `error: ${error}`,
-        });
-    }
-}
-
-//[GET] /user/roles/list-user/:clubId
-module.exports.addUser = async (req, res) => {
-    try {
-        const clubId = req.params.clubId;
-        if (clubId) {
-
         }
     } catch (error) {
         return res.status(500).json({

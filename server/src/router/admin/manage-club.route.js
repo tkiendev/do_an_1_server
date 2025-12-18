@@ -5,8 +5,8 @@ const manageClubController = require('../../controllers/admin/manage-club.contro
 
 // admin/manage-club
 router.get('/index', manageClubController.index);
-router.put('/confirm-registration/:clubId/:userId', manageClubController.confirmRegistration);
-
+router.put('/confirm-registration/:clubId', manageClubController.confirmRegistration);
+router.get('/detail/:clubId', manageClubController.detail);
 
 
 module.exports = router;

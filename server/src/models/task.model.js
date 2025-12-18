@@ -15,7 +15,7 @@ const taskShema = new Schema({
     },
     status: {
         type: String,
-        enum: ['confirm', 'unconfirm', 'action', 'inaction', 'update-again'],
+        enum: ['confirm', 'unconfirm', 'action', 'inaction', 'update-again', 'completed'],
         default: 'unconfirm'
     },
 });
