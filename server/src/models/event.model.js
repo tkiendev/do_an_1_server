@@ -6,14 +6,9 @@ const moment = require('moment');
 const eventShema = new Schema({
     name: String,
     description: String,
-    StartTime: { type: Date, set: val => moment(val).toDate() },
-    EndTime: { type: Date, set: val => moment(val).toDate() },
+    StartTime: { type: Date, set: val => moment(val, "DD-MM-YYYY").toDate() },
+    EndTime: { type: Date, set: val => moment(val, "DD-MM-YYYY").toDate() },
     location: String,
-    eventManagerId: String,
-    eventParticipantsId: {
-        type: Array,
-        default: []
-    },
     clubPresident: String,
     tasksId: {
         type: Array,
@@ -21,12 +16,19 @@ const eventShema = new Schema({
     },
     status: {
         type: String,
-        enum: ['confirm', 'unconfirm', 'update-again'],
+        enum: ['confirm', 'unconfirm', 'update-again', 'active', 'inactive', 'not-approved'],
         default: 'unconfirm'
     },
     deleted: {
         type: Boolean,
         default: false
+    },
+    createBy: {
+        type: Object,
+        default: {
+            userId: String,
+            createTime: Date
+        }
     }
 });
 

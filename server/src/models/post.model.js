@@ -24,6 +24,13 @@ const postSchema = new Schema({
     deleted: {
         type: Boolean,
         default: false
+    },
+    createBy: {
+        type: Object,
+        default: {
+            userId: String,
+            createTime: Date
+        }
     }
 });
 

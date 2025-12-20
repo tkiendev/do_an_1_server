@@ -15,6 +15,10 @@ const adminSchema = new Schema({
         required: true,
         default: generateRandomString(20)
     },
+    notificationsId: {
+        type: Array,
+        default: []
+    },
     avatar: {
         type: String,
         default: 'https://cdn.sforum.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg'

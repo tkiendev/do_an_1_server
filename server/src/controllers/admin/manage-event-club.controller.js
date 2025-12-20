@@ -2,6 +2,8 @@ const clubModel = require('../../models/club.model.js');
 const eventModel = require('../../models/event.model.js');
 const userModel = require('../../models/user.model.js');
 const taskModel = require('../../models/task.model.js');
+const adminModel = require('../../models/admin.model.js');
+const notificationModel = require('../../models/notifications.model.js');
 
 // [GET] /admin/manage-event-club/index?status=?(confirm || unconfirm)
 module.exports.index = async (req, res) => {
@@ -59,20 +61,112 @@ module.exports.index = async (req, res) => {
 // [PUT] /admin/manage-event-club/confirm/:envenId
 module.exports.confirmEvent = async (req, res) => {
     try {
+        const token = req.headers.token;
         const envenId = req.params.envenId;
         if (envenId) {
-            const result = await eventModel.updateOne({ _id: envenId }, { status: 'confirm' });
-
-            if (result.matchedCount > 0 && result.modifiedCount > 0) {
-                return res.status(200).json({
-                    code: 200,
-                    message: 'Chấp nhận sự kiện thành công',
+            const event = await eventModel.findOne({ _id: envenId });
+            if (!event) {
+                return res.status(400).json({
+                    code: 400,
+                    message: 'Sự kiện không tồn tại hoặc đã bị xóa',
                     data: null
                 });
+            }
+            const result = await eventModel.updateOne({ _id: envenId }, { status: 'inactive' });
+
+
+            if (result.matchedCount > 0 && result.modifiedCount > 0) {
+                const club = await clubModel.findOne({ _id: event.clubPresident });
+                const userId = (await userModel.find({ clubId: club._id }).select('_id')).map(user => user._id.toString());
+                const adminId = (await adminModel.findOne({ token: token }).select('_id'))._id.toString();
+                const content = (`
+                    Sự kiện của câu lạc bộ đã được chấp nhận hoạt động với thời gian: ${event.StartTime} - ${event.EndTime}
+                    trong thời gian diễn ra sự kiện câu lạc bộ phải tuân thủ các quy định của trường
+                    nếu có dấu hiệu vi phạm chúng tôi sẽ cưỡng chế dừng sự kiện
+                    xin cảm ơn
+                `).trim();
+
+                const newNotification = new notificationModel({
+                    name: `Sự kiện: ${event.name} đã được duyệt`,
+                    content,
+                    sentFrom: adminId,
+                    sentTo: userId
+                });
+                newNotification.save();
+                if (newNotification) {
+                    await userModel.updateMany({ clubId: club._id }, { $push: { notificationsId: newNotification.id } });
+                    return res.status(200).json({
+                        code: 200,
+                        message: 'Chấp nhận sự kiện thành công',
+                        data: null
+                    });
+                }
+
             } else if (result.matchedCount > 0 && result.modifiedCount === 0) {
                 return res.status(500).json({
                     code: 500,
                     message: 'Chấp nhận sự kiện thất bại',
+                    data: null
+                });
+            } else {
+                return res.status(404).json({
+                    code: 404,
+                    message: 'Không tìn thấy sự kiện vui lòng kiểm tra lại!',
+                    data: null
+                });
+            }
+        }
+    } catch (error) {
+        return res.status(500).json({
+            code: 500,
+            message: `error: ${error}`
+        });
+    }
+}
+
+// [PUT] /admin/manage-event-club/unconfirm/:envenId
+module.exports.unconfirmEvent = async (req, res) => {
+    try {
+        const token = req.headers.token;
+        const envenId = req.params.envenId;
+        const { content } = req.body;
+        console.log(content);
+        if (envenId) {
+            const event = await eventModel.findOne({ _id: envenId });
+            if (!event) {
+                return res.status(400).json({
+                    code: 400,
+                    message: 'Sự kiện không tồn tại hoặc đã bị xóa',
+                    data: null
+                });
+            }
+            const result = await eventModel.updateOne({ _id: envenId }, { status: 'not-approved' });
+
+
+            if (result.matchedCount > 0 && result.modifiedCount > 0) {
+                const leaderId = (await clubModel.findOne({ _id: event.clubPresident }).select('nameOfTheOwner')).nameOfTheOwner.toString();
+                const adminId = (await adminModel.findOne({ token: token }).select('_id'))._id.toString();
+                const newNotification = new notificationModel({
+                    name: `Sự kiện: ${event.name} đã bị từ chối`,
+                    content,
+                    sentFrom: adminId,
+                    sentTo: leaderId
+                });
+
+                newNotification.save();
+                if (newNotification) {
+                    await userModel.updateOne({ _id: leaderId }, { $push: { notificationsId: newNotification.id } });
+                    return res.status(200).json({
+                        code: 200,
+                        message: 'Từ chối sự kiện thành công',
+                        data: null
+                    });
+                }
+
+            } else if (result.matchedCount > 0 && result.modifiedCount === 0) {
+                return res.status(500).json({
+                    code: 500,
+                    message: 'Từ chối sự kiện thất bại',
                     data: null
                 });
             } else {

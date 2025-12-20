@@ -4,10 +4,7 @@ const { Schema } = mongoose;
 const notificationSchema = new Schema({
     name: String,
     content: String,
-    sentFrom: {
-        type: Array,
-        default: [],
-    },
+    sentFrom: String,
     sentTo: {
         type: Array,
         default: [],
